@@ -16,40 +16,12 @@ export function useUpdateUser(id: UniqueIdentifier) {
     mutationKey: ["users", "update", String(id)],
     mutationFn: (data: UpdateUserSchema) =>
       tuyau.api.users({ id }).$patch(data).unwrap(),
-    onMutate: async (data) => {
+    onMutate: async () => {
       await queryClient.cancelQueries({ queryKey: allQueryKey });
       await queryClient.cancelQueries({ queryKey: detailQueryKey });
 
       const prevAllData = queryClient.getQueryData(allQueryKey);
       const prevDetailData = queryClient.getQueryData(detailQueryKey);
-
-      queryClient.setQueryData(allQueryKey, (prev) => {
-        if (!prev) return prev;
-        return {
-          ...prev,
-          users: prev.users.map((user) =>
-            user.id === id
-              ? {
-                  ...user,
-                  ...data,
-                  dob: data.dob ? data.dob.toISOString() : null,
-                }
-              : user,
-          ),
-        };
-      });
-
-      queryClient.setQueryData(detailQueryKey, (prev) => {
-        if (!prev) return prev;
-        return {
-          ...prev,
-          user: {
-            ...prev.user,
-            ...data,
-            dob: data.dob ? data.dob.toISOString() : null,
-          },
-        };
-      });
 
       return { prevAllData, prevDetailData };
     },
@@ -83,10 +55,6 @@ export function useUpdateUser(id: UniqueIdentifier) {
       });
 
       toast.success(data.message);
-    },
-    onSettled: () => {
-      queryClient.invalidateQueries({ queryKey: allQueryKey });
-      queryClient.invalidateQueries({ queryKey: detailQueryKey });
     },
   });
 }

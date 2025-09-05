@@ -1,0 +1,21 @@
+{
+  "name": "@repo/eslint-config",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "exports": {
+    "./backend": "./backend.js",
+    "./frontend": "./frontend.js"
+  },
+  "devDependencies": {
+    "@adonisjs/eslint-config": "^2.1.2",
+    "@eslint/js": "^9.34.0",
+    "@tanstack/eslint-plugin-router": "^1.131.2",
+    "eslint": "^9.34.0",
+    "eslint-config-turbo": "^2.5.6",
+    "eslint-plugin-react-hooks": "^5.2.0",
+    "eslint-plugin-react-refresh": "^0.4.20",
+    "globals": "^14.0.0",
+    "typescript-eslint": "^8.40.0"
+  }
+}

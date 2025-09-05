@@ -1,0 +1,10 @@
+{
+  "extends": "@repo/typescript-config/frontend.json",
+  "include": ["**/*.ts", "**/*.tsx"],
+  "compilerOptions": {
+    "baseUrl": ".",
+    "paths": {
+      "~/*": ["./src/*"]
+    }
+  }
+}

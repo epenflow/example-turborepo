@@ -28,7 +28,7 @@ export function tuyauOnSubmit<TData, TError, TVariables, TContext>(
       console.log({ e });
 
       if (e instanceof TuyauHTTPError) {
-        const [formsReporter, fieldsReporter] = errorReport(e);
+        const [formsReporter, fieldsReporter] = tuyauHTTPErrorReporter(e);
 
         form.push(...formsReporter);
         Object.assign(fields, fieldsReporter);
@@ -48,7 +48,9 @@ export function tuyauOnSubmit<TData, TError, TVariables, TContext>(
   };
 }
 
-function errorReport(error: unknown): [string[], Record<string, unknown[]>] {
+function tuyauHTTPErrorReporter(
+  error: unknown,
+): [string[], Record<string, unknown[]>] {
   const formErrors: string[] = [];
   const fieldErrors: Record<string, unknown[]> = Object.create(null);
 

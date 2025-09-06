@@ -18,7 +18,7 @@ export default class SessionController {
   }
 
   async signUp({ request }: HttpContext) {
-    const data = await request.validateUsing(UserValidator.createUser)
+    const { avatar, ...data } = await request.validateUsing(UserValidator.createUser)
 
     const user = await User.create(data)
 

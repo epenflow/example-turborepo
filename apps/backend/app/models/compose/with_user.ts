@@ -8,18 +8,26 @@ import type { HasMany } from '@adonisjs/lucid/types/relations'
 export function WithUserComputed<T extends NormalizeConstructor<typeof BaseModel>>(superclass: T) {
   class BaseClass extends superclass {
     @computed()
-    get fullName() {
+    get fullName(): string | null {
       const firstName: string | null = (this as any)['firstName']
       const lastName: string | null = (this as any)['lastName']
 
-      return `${firstName || ''} ${lastName || ''}`.trim()
+      if (!firstName && !lastName) return null
+
+      const $fullName = `${firstName || ''} ${lastName || ''}`.trim()
+
+      return $fullName.length > 0 ? $fullName : null
     }
 
     @computed()
-    get initialName() {
+    get initialName(): string {
+      const defaultInitial = ((this as any)['username'] as string).charAt(0).toUpperCase()
+
+      if (!this.fullName) return defaultInitial
+
       const names = this.fullName.split(' ').filter(Boolean)
 
-      if (names.length === 0) return ((this as any)['username'] as string).charAt(0).toUpperCase()
+      if (names.length === 0) return defaultInitial
       if (names.length === 1) return names[0].charAt(0).toUpperCase()
 
       const firstInitial = names[0].charAt(0)

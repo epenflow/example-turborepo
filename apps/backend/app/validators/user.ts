@@ -2,8 +2,8 @@ import vine, { SimpleMessagesProvider } from '@vinejs/vine'
 import { DateTime } from 'luxon'
 
 const userInfo = vine.object({
-  firstName: vine.string().optional(),
-  lastName: vine.string().optional(),
+  firstName: vine.string().optional().nullable(),
+  lastName: vine.string().optional().nullable(),
   dob: vine
     .string()
     .transform((date) => DateTime.fromISO(date))

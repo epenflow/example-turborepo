@@ -1,24 +1,23 @@
 import { AccessToken, DbAccessTokensProvider } from '@adonisjs/auth/access_tokens'
-import { withAuthFinder } from '@adonisjs/auth/mixins/lucid'
 import { MultipartFile } from '@adonisjs/core/bodyparser'
 import { compose, cuid } from '@adonisjs/core/helpers'
 import app from '@adonisjs/core/services/app'
-import hash from '@adonisjs/core/services/hash'
-import { BaseModel, column, computed, hasMany } from '@adonisjs/lucid/orm'
+import { BaseModel, column } from '@adonisjs/lucid/orm'
 import { ModelAttributes } from '@adonisjs/lucid/types/model'
-import { type HasMany } from '@adonisjs/lucid/types/relations'
 import { DateTime } from 'luxon'
 import fs from 'node:fs/promises'
 import WithIdentifier from './compose/with_identifier.js'
 import WithTimestamp from './compose/with_timestamp.js'
-import ResetPasswordToken from './reset_password_token.js'
+import { WithUserAuth, WithUserComputed, WithUserRelations } from './compose/with_user.js'
 
-const AuthFinder = withAuthFinder(() => hash.use('scrypt'), {
-  uids: ['email'],
-  passwordColumnName: 'password',
-})
-
-export default class User extends compose(BaseModel, AuthFinder, WithIdentifier, WithTimestamp) {
+export default class User extends compose(
+  BaseModel,
+  WithIdentifier,
+  WithTimestamp,
+  WithUserAuth,
+  WithUserComputed,
+  WithUserRelations
+) {
   @column()
   declare firstName: string | null
 
@@ -38,32 +37,11 @@ export default class User extends compose(BaseModel, AuthFinder, WithIdentifier,
 
   static currentAccessToken?: AccessToken
 
-  @hasMany(() => ResetPasswordToken)
-  declare resetPasswordTokens: HasMany<typeof ResetPasswordToken>
-
   @column.dateTime()
   declare dob: DateTime | null
 
   @column()
   declare avatar: string | null
-
-  @computed()
-  get fullName() {
-    return `${this.firstName ?? ''} ${this.lastName ?? ''}`.trim()
-  }
-
-  @computed()
-  get initialName() {
-    const names = this.fullName.split(' ').filter(Boolean)
-
-    if (names.length === 0) return this.username.charAt(0).toUpperCase()
-    if (names.length === 1) return names[0].charAt(0).toUpperCase()
-
-    const firstInitial = names[0].charAt(0)
-    const lastInitial = names[names.length - 1].charAt(0)
-
-    return `${firstInitial}${lastInitial}`.toUpperCase()
-  }
 
   static async saveAvatarToDisk(file?: MultipartFile) {
     if (file) {

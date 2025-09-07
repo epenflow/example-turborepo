@@ -4,6 +4,7 @@ import hash from '@adonisjs/core/services/hash'
 import { NormalizeConstructor } from '@adonisjs/core/types/helpers'
 import { BaseModel, computed, hasMany } from '@adonisjs/lucid/orm'
 import type { HasMany } from '@adonisjs/lucid/types/relations'
+import { DateTime } from 'luxon'
 
 export function WithUserComputed<T extends NormalizeConstructor<typeof BaseModel>>(superclass: T) {
   class BaseClass extends superclass {
@@ -34,6 +35,17 @@ export function WithUserComputed<T extends NormalizeConstructor<typeof BaseModel
       const lastInitial = names[names.length - 1].charAt(0)
 
       return `${firstInitial}${lastInitial}`.toUpperCase()
+    }
+
+    @computed()
+    get age(): number | null {
+      const dob: DateTime<boolean> | null = (this as any)['dob']
+
+      if (!dob) return null
+
+      const age = DateTime.now().diff(dob, ['years', 'months', 'days']).toObject()
+
+      return age.years || null
     }
   }
 

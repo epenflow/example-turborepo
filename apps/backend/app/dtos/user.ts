@@ -10,8 +10,9 @@ export default class UserDto extends BaseModelDto {
   declare email: string
   // declare password: string
   declare dob: string | null
+  declare age: number | null
   declare avatar: string | null
-  declare fullName: string
+  declare fullName: string | null
   declare initialName: string
   declare createdAt: string
   declare updatedAt: string
@@ -27,6 +28,7 @@ export default class UserDto extends BaseModelDto {
     this.email = user.email
     // this.password = user.password
     this.dob = user.dob?.toISO() || null
+    this.age = user.age
     this.avatar = user.avatar
     this.fullName = user.fullName
     this.initialName = user.initialName

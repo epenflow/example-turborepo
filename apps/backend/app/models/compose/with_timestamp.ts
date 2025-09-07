@@ -3,7 +3,7 @@ import { BaseModel, column } from '@adonisjs/lucid/orm'
 import { DateTime } from 'luxon'
 
 export default function <T extends NormalizeConstructor<typeof BaseModel>>(superclass: T) {
-  class WithTimestampBaseModel extends superclass {
+  class BaseClass extends superclass {
     @column.dateTime({ autoCreate: true })
     declare createdAt: DateTime
 
@@ -11,5 +11,5 @@ export default function <T extends NormalizeConstructor<typeof BaseModel>>(super
     declare updatedAt: DateTime
   }
 
-  return WithTimestampBaseModel
+  return BaseClass
 }

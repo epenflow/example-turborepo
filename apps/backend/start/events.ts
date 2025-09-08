@@ -5,7 +5,7 @@ import emitter from '@adonisjs/core/services/emitter'
 import mail from '@adonisjs/mail/services/main'
 
 emitter.on('user:request-reset-password', async (event) => {
-  await mail.send(new SendResetPasswordRequestNotification(event.user, event.resetLink))
+  await mail.send(new SendResetPasswordRequestNotification(event.user, event.link))
 })
 emitter.on('user:reset-password', async (event) => {
   await mail.send(new SendResetPasswordNotification(event))
@@ -15,7 +15,7 @@ declare module '@adonisjs/core/types' {
   interface EventsList {
     'user:request-reset-password': {
       user: User
-      resetLink: string
+      link: string
     }
     'user:reset-password': User
   }

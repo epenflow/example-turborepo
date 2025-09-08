@@ -7,21 +7,15 @@ import { DateTime } from 'luxon'
 import fs from 'node:fs/promises'
 import WithIdentifier from './compose/with_identifier.js'
 import WithTimestamp from './compose/with_timestamp.js'
-import {
-  WithUserAuth,
-  WithUserComputed,
-  WithUserCredentials,
-  WithUserRelations,
-} from './compose/with_user.js'
+import { WithUserAuth, WithUserComputed, WithUserCredentials } from './compose/with_user.js'
 
 export default class User extends compose(
   BaseModel,
   WithIdentifier,
   WithTimestamp,
-  WithUserAuth,
   WithUserCredentials,
   WithUserComputed,
-  WithUserRelations
+  WithUserAuth
 ) {
   @column()
   declare firstName: string | null

@@ -1,4 +1,3 @@
-import ResetPasswordToken from '#models/reset_password_token'
 import User from '#models/user'
 import env from '#start/env'
 import { AuthValidator } from '#validators/index'
@@ -6,6 +5,7 @@ import { errors as authErrors } from '@adonisjs/auth'
 import { HttpContext } from '@adonisjs/core/http'
 import emitter from '@adonisjs/core/services/emitter'
 import router from '@adonisjs/core/services/router'
+import { DateTime } from 'luxon'
 
 export default class PasswordController {
   async forgot({ request }: HttpContext) {
@@ -13,22 +13,16 @@ export default class PasswordController {
     const user = await User.findBy('email', data.email)
 
     if (user) {
-      const resetToken = await ResetPasswordToken.generate(user)
+      const { token, expiresAt } = await User.createResetPasswordToken(user)
 
-      const resetLink = router
+      const link = router
         .builder()
         .disableRouteLookup()
         .prefixUrl(env.get('APP_BASE_URL'))
-        .qs({
-          token: resetToken.token,
-          expiresAt: resetToken.expiresAt.toISO(),
-        })
+        .qs({ token, expiresAt: DateTime.fromJSDate(expiresAt).toISO() })
         .make('reset-password')
 
-      emitter.emit('user:request-reset-password', {
-        user,
-        resetLink,
-      })
+      emitter.emit('user:request-reset-password', { user, link })
     }
 
     return {
@@ -41,7 +35,7 @@ export default class PasswordController {
 
     if (token) {
       const data = await request.validateUsing(AuthValidator.resetPassword)
-      const user = await ResetPasswordToken.reset(token, data.new)
+      const user = await User.resetPassword(token, data.new)
 
       emitter.emit('user:reset-password', user)
     }

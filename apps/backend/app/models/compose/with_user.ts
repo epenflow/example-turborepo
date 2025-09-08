@@ -1,10 +1,10 @@
-import ResetPasswordToken from '#models/reset_password_token'
+import InvalidResetPasswordTokenException from '#exceptions/invalid_reset_password_token_exception'
+import DbTokensProvider from '#models/db_token_provider'
 import { AccessToken, DbAccessTokensProvider } from '@adonisjs/auth/access_tokens'
 import { withAuthFinder } from '@adonisjs/auth/mixins/lucid'
 import hash from '@adonisjs/core/services/hash'
 import { NormalizeConstructor } from '@adonisjs/core/types/helpers'
-import { BaseModel, column, computed, hasMany } from '@adonisjs/lucid/orm'
-import type { HasMany } from '@adonisjs/lucid/types/relations'
+import { BaseModel, beforeUpdate, column, computed } from '@adonisjs/lucid/orm'
 import { DateTime } from 'luxon'
 
 export function WithUserComputed<T extends NormalizeConstructor<typeof BaseModel>>(superclass: T) {
@@ -57,18 +57,35 @@ export const WithUserAuth = withAuthFinder(() => hash.use('scrypt'), {
   passwordColumnName: 'password',
 })
 
-export function WithUserRelations<T extends NormalizeConstructor<typeof BaseModel>>(superclass: T) {
-  class BaseClass extends superclass {
-    @hasMany(() => ResetPasswordToken)
-    declare resetPasswordTokens: HasMany<typeof ResetPasswordToken>
-  }
-
-  return BaseClass
+type WithUserCredentialsColumn = {
+  username: string
+  email: string
+  password: string
+  lastPasswordChangedAt: DateTime<boolean> | null
 }
 
-export function WithUserCredentials<T extends NormalizeConstructor<typeof BaseModel>>(
-  superclass: T
-) {
+type WithUserCredentialsClass<
+  Model extends NormalizeConstructor<typeof BaseModel> = NormalizeConstructor<typeof BaseModel>,
+> = Model & {
+  new (...args: any[]): WithUserCredentialsColumn
+  accessTokens: DbAccessTokensProvider<Model>
+  currentAccessToken?: AccessToken
+  tokens: DbTokensProvider<Model, 'reset_password' | 'email_verification'>
+  resetPassword<T extends WithUserCredentialsClass>(
+    this: T,
+    token: string,
+    password: string
+  ): Promise<InstanceType<T>>
+  createResetPasswordToken(user: InstanceType<Model>): Promise<{ token: string; expiresAt: Date }>
+  createEmailVerificationToken(
+    user: InstanceType<Model>
+  ): Promise<{ token: string; expiresAt: Date }>
+  updateLastPasswordChangedAt(user: InstanceType<Model>): void
+}
+
+export function WithUserCredentials<Model extends NormalizeConstructor<typeof BaseModel>>(
+  superclass: Model
+): WithUserCredentialsClass<Model> {
   class BaseClass extends superclass {
     @column()
     declare username: string
@@ -79,9 +96,63 @@ export function WithUserCredentials<T extends NormalizeConstructor<typeof BaseMo
     @column({ serializeAs: null })
     declare password: string
 
+    @column.dateTime()
+    declare lastPasswordChangedAt: DateTime | null
+
     static accessTokens = DbAccessTokensProvider.forModel(BaseClass)
 
     static currentAccessToken?: AccessToken
+
+    static tokens = DbTokensProvider.forModel<
+      typeof BaseClass,
+      'reset_password' | 'email_verification'
+    >(BaseClass, {
+      table: 'user_tokens',
+    })
+
+    @beforeUpdate()
+    static async updateLastPasswordChangedAt(user: InstanceType<typeof BaseClass>) {
+      if (user.$dirty.password) {
+        user.lastPasswordChangedAt = DateTime.now()
+      }
+    }
+
+    static async createResetPasswordToken(user: InstanceType<typeof BaseClass>) {
+      await this.tokens.clearTokens(user)
+
+      return this.tokens.create(user, 'reset_password')
+    }
+    static async createEmailVerificationToken(user: InstanceType<typeof BaseClass>) {
+      await this.tokens.clearTokens(user)
+
+      return this.tokens.create(user, 'email_verification')
+    }
+
+    static async resetPassword<This extends WithUserCredentialsClass>(
+      this: This,
+      token: string,
+      password: string
+    ) {
+      const verifiedToken = await BaseClass.tokens.verify(token, 'reset_password')
+
+      if (!verifiedToken || verifiedToken.isExpires) {
+        throw new InvalidResetPasswordTokenException()
+      }
+      const { row } = verifiedToken
+
+      const user = await this.query().where({ id: row.tokenableId }).first()
+
+      if (!user) {
+        throw new InvalidResetPasswordTokenException()
+      }
+
+      ;(user as any).merge({ password })
+      await user.save()
+
+      await BaseClass.tokens.invalidated(token)
+
+      return user
+    }
   }
 
   return BaseClass

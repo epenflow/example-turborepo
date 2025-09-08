@@ -4,7 +4,7 @@ export default class extends BaseSchema {
   protected readonly tableNames = {
     users: 'users',
     authAccessTokens: 'auth_access_tokens',
-    resetPasswordTokens: 'reset_password_tokens',
+    user_tokens: 'user_tokens',
   }
 
   async up() {
@@ -17,6 +17,8 @@ export default class extends BaseSchema {
       table.string('password').notNullable()
       table.timestamp('dob').nullable()
       table.string('avatar').nullable()
+      table.timestamp('email_verified_at').nullable()
+      table.timestamp('last_password_changed_at').nullable()
     })
 
     this.schema.createTable(this.tableNames.authAccessTokens, (table) => {
@@ -38,7 +40,7 @@ export default class extends BaseSchema {
       table.timestamp('expires_at').nullable()
     })
 
-    this.schema.createTable(this.tableNames.resetPasswordTokens, (table) => {
+    this.schema.createTable(this.tableNames.user_tokens, (table) => {
       table.increments('id')
       table
         .integer('tokenable_id')
@@ -46,9 +48,10 @@ export default class extends BaseSchema {
         .unsigned()
         .references('id')
         .inTable(this.tableNames.users)
-
         .onDelete('CASCADE')
-      table.string('value', 255).notNullable()
+
+      table.string('token').notNullable()
+      table.string('type').notNullable()
       table.timestamp('expires_at').notNullable()
     })
 
@@ -69,7 +72,7 @@ export default class extends BaseSchema {
     })
 
     this.schema.dropTable(this.tableNames.authAccessTokens)
-    this.schema.dropTable(this.tableNames.resetPasswordTokens)
+    this.schema.dropTable(this.tableNames.user_tokens)
     this.schema.dropTable(this.tableNames.users)
   }
 }

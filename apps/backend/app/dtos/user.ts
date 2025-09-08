@@ -16,6 +16,7 @@ export default class UserDto extends BaseModelDto {
   declare initialName: string
   declare createdAt: string
   declare updatedAt: string
+  declare lastPasswordChangedAt: string | null
 
   constructor(user?: User) {
     super()
@@ -34,5 +35,6 @@ export default class UserDto extends BaseModelDto {
     this.initialName = user.initialName
     this.createdAt = user.createdAt.toISO()!
     this.updatedAt = user.updatedAt.toISO()!
+    this.lastPasswordChangedAt = user.lastPasswordChangedAt?.toISO() || null
   }
 }

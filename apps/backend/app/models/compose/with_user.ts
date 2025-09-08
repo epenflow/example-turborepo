@@ -1,8 +1,9 @@
 import ResetPasswordToken from '#models/reset_password_token'
+import { AccessToken, DbAccessTokensProvider } from '@adonisjs/auth/access_tokens'
 import { withAuthFinder } from '@adonisjs/auth/mixins/lucid'
 import hash from '@adonisjs/core/services/hash'
 import { NormalizeConstructor } from '@adonisjs/core/types/helpers'
-import { BaseModel, computed, hasMany } from '@adonisjs/lucid/orm'
+import { BaseModel, column, computed, hasMany } from '@adonisjs/lucid/orm'
 import type { HasMany } from '@adonisjs/lucid/types/relations'
 import { DateTime } from 'luxon'
 
@@ -60,6 +61,27 @@ export function WithUserRelations<T extends NormalizeConstructor<typeof BaseMode
   class BaseClass extends superclass {
     @hasMany(() => ResetPasswordToken)
     declare resetPasswordTokens: HasMany<typeof ResetPasswordToken>
+  }
+
+  return BaseClass
+}
+
+export function WithUserCredentials<T extends NormalizeConstructor<typeof BaseModel>>(
+  superclass: T
+) {
+  class BaseClass extends superclass {
+    @column()
+    declare username: string
+
+    @column()
+    declare email: string
+
+    @column({ serializeAs: null })
+    declare password: string
+
+    static accessTokens = DbAccessTokensProvider.forModel(BaseClass)
+
+    static currentAccessToken?: AccessToken
   }
 
   return BaseClass

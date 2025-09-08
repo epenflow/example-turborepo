@@ -1,4 +1,3 @@
-import { AccessToken, DbAccessTokensProvider } from '@adonisjs/auth/access_tokens'
 import { MultipartFile } from '@adonisjs/core/bodyparser'
 import { compose, cuid } from '@adonisjs/core/helpers'
 import app from '@adonisjs/core/services/app'
@@ -8,13 +7,19 @@ import { DateTime } from 'luxon'
 import fs from 'node:fs/promises'
 import WithIdentifier from './compose/with_identifier.js'
 import WithTimestamp from './compose/with_timestamp.js'
-import { WithUserAuth, WithUserComputed, WithUserRelations } from './compose/with_user.js'
+import {
+  WithUserAuth,
+  WithUserComputed,
+  WithUserCredentials,
+  WithUserRelations,
+} from './compose/with_user.js'
 
 export default class User extends compose(
   BaseModel,
   WithIdentifier,
   WithTimestamp,
   WithUserAuth,
+  WithUserCredentials,
   WithUserComputed,
   WithUserRelations
 ) {
@@ -23,19 +28,6 @@ export default class User extends compose(
 
   @column()
   declare lastName: string | null
-
-  @column()
-  declare username: string
-
-  @column()
-  declare email: string
-
-  @column({ serializeAs: null })
-  declare password: string
-
-  static accessTokens = DbAccessTokensProvider.forModel(User)
-
-  static currentAccessToken?: AccessToken
 
   @column.dateTime()
   declare dob: DateTime | null

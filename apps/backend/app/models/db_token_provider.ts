@@ -48,7 +48,7 @@ export default class DbTokensProvider<TokenableModel extends LucidModel, TokenTy
 
     if (!user.$primaryKeyValue) {
       throw new RuntimeException(
-        `Cannot use "${model.name}" model for managing access tokens. The value of column "${model.primaryKey}" is undefined or null`
+        `Cannot use "${model.name}" model for managing ${this.table}. The value of column "${model.primaryKey}" is undefined or null`
       )
     }
   }
@@ -57,17 +57,19 @@ export default class DbTokensProvider<TokenableModel extends LucidModel, TokenTy
     return value !== null && typeof value === 'object' && !Array.isArray(value)
   }
 
-  protected dbRowToToken(dbRow: DbTokensColumn<TokenType>): {
+  protected dbRowToToken(dbRow: DbTokensColumn<TokenType> & { id: string | number | BigInt }): {
+    id: string | number | BigInt
     tokenableId: string | number | BigInt
-    type: string
+    type: TokenType
     token: string
     createdAt: Date
     updatedAt: Date
     expiresAt: Date
   } {
     return {
+      id: dbRow.id,
       tokenableId: dbRow.tokenable_id,
-      type: String(dbRow.type),
+      type: dbRow.type,
       token: dbRow.token,
       createdAt: dbRow.created_at,
       updatedAt: dbRow.updated_at,
@@ -106,17 +108,14 @@ export default class DbTokensProvider<TokenableModel extends LucidModel, TokenTy
 
   async verify(token: string, type: TokenType) {
     const db = await this.getDb()
-    const dbRow = await db
-      .query()
-      .from(this.table)
-      .where({ token: token, type: type })
-      .andWhere('expires_at', '>=', DateTime.now().toSQL())
-      .first()
+    const dbRow = await db.query().from(this.table).where({ token, type }).first()
 
     if (!dbRow) return null
 
+    if (DateTime.fromSQL(dbRow.expires_at) <= DateTime.now()) return null
+
     return {
-      isExpires: DateTime.fromSQL(dbRow.expires_at) <= DateTime.now(),
+      isExpires: false,
       row: this.dbRowToToken(dbRow),
     }
   }

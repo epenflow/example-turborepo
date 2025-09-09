@@ -17,8 +17,8 @@ export default class extends BaseSchema {
       table.string('password').notNullable()
       table.timestamp('dob').nullable()
       table.string('avatar').nullable()
-      table.timestamp('email_verified_at').nullable()
-      table.timestamp('last_password_changed_at').nullable()
+      table.timestamp('email_verified_at').defaultTo(null).nullable()
+      table.timestamp('last_password_changed_at').defaultTo(null).nullable()
     })
 
     this.schema.createTable(this.tableNames.authAccessTokens, (table) => {

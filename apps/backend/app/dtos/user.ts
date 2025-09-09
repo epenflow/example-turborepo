@@ -17,6 +17,8 @@ export default class UserDto extends BaseModelDto {
   declare createdAt: string
   declare updatedAt: string
   declare lastPasswordChangedAt: string | null
+  declare emailVerifiedAt: string | null
+  declare isEmailVerified: boolean
 
   constructor(user?: User) {
     super()
@@ -36,5 +38,7 @@ export default class UserDto extends BaseModelDto {
     this.createdAt = user.createdAt.toISO()!
     this.updatedAt = user.updatedAt.toISO()!
     this.lastPasswordChangedAt = user.lastPasswordChangedAt?.toISO() || null
+    this.emailVerifiedAt = user.emailVerifiedAt?.toISO() || null
+    this.isEmailVerified = user.isEmailVerified
   }
 }

@@ -30,6 +30,7 @@ const MUTATION_KEY = {
   changePassword: ["auth", "change-password"],
   updateAccount: ["auth", "update-account"],
   deleteAccount: ["auth", "delete-account"],
+  emailVerificationSend: ["auth", "email-verification", "send"],
 } as const;
 
 export function useSignIn(redirectTo?: FileRouteTypes["to"]) {
@@ -215,6 +216,41 @@ export function useUpdateAccount() {
     onError: () => {
       queryClient.invalidateQueries({ queryKey: meKey });
       queryClient.invalidateQueries({ queryKey: sessionKey });
+    },
+  });
+}
+
+export function useEmailVerificationSend() {
+  return useMutation({
+    mutationKey: MUTATION_KEY.emailVerificationSend,
+    mutationFn: (data: { email: string }) =>
+      tuyau.auth["email-verification"].send.$post(data).unwrap(),
+    onSuccess: (data) => {
+      toast.success(data.message);
+    },
+  });
+}
+
+export function useEmailVerificationConfirm() {
+  const queryClient = useQueryClient();
+  const sessionKey = authQueries.session.queryKey;
+  const meKey = authQueries.me.queryKey;
+
+  return useMutation({
+    mutationKey: ["auth", "email-verification", "confirm"],
+    mutationFn: (token: string) =>
+      tuyau.auth["email-verification"].confirm
+        .$get({
+          headers: {
+            "X-Email-Verification-Token": token,
+          },
+        })
+        .unwrap(),
+    onSuccess: async (data) => {
+      await queryClient.invalidateQueries({ queryKey: meKey });
+      await queryClient.invalidateQueries({ queryKey: sessionKey });
+
+      toast.success(data.message);
     },
   });
 }

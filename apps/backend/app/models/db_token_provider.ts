@@ -6,6 +6,7 @@ import { inspect } from 'node:util'
 
 type DbTokensProviderOptions = {
   table?: string
+  expiresIn?: Date
 }
 
 type DbTokensColumn<TokenType> = {
@@ -88,7 +89,7 @@ export default class DbTokensProvider<TokenableModel extends LucidModel, TokenTy
       updated_at: new Date(),
       token: string.random(32),
       type: type,
-      expires_at: DateTime.now().plus({ minute: 1 }).toJSDate(),
+      expires_at: this.options.expiresIn || DateTime.utc().plus({ hour: 1 }).toJSDate(),
     }
 
     const result = await queryClient.table(this.table).insert(dbRow).returning('id')
@@ -112,7 +113,7 @@ export default class DbTokensProvider<TokenableModel extends LucidModel, TokenTy
 
     if (!dbRow) return null
 
-    if (DateTime.fromSQL(dbRow.expires_at) <= DateTime.now()) return null
+    if (DateTime.fromSQL(dbRow.expires_at) <= DateTime.utc()) return null
 
     return {
       isExpires: false,

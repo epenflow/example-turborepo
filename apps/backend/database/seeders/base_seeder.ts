@@ -16,6 +16,10 @@ export default class extends BaseSeeder {
     }
 
     await UserFactory.merge({ email: 'epenflow@gmail.com', password: '1' }).create()
-    await UserFactory.merge({ email: 'inyomanbudayasa86@gmail.com', password: '1' }).create()
+    await UserFactory.merge({
+      email: 'inyomanbudayasa86@gmail.com',
+      password: '1',
+      emailVerifiedAt: null,
+    }).create()
   }
 }

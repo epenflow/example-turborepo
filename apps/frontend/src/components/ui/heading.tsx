@@ -1,3 +1,4 @@
+import type { ReactNode } from "react";
 import { cva, type VariantProps } from "class-variance-authority";
 
 import { cn } from "~/lib/utils";
@@ -28,7 +29,7 @@ const titleVariant = cva("", {
 
 type HeadingProps = {
   title: string;
-  description?: string;
+  description?: string | ReactNode;
 } & VariantProps<typeof headingVariant>;
 
 export function Heading({
@@ -39,8 +40,10 @@ export function Heading({
   return (
     <div className={cn(headingVariant({ variant }))}>
       <h6 className={cn(titleVariant({ variant }))}>{title}</h6>
-      {description && (
+      {typeof description === "string" ? (
         <p className="text-sm text-muted-foreground">{description}</p>
+      ) : (
+        description
       )}
     </div>
   );

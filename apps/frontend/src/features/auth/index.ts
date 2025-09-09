@@ -2,6 +2,7 @@ export * from "./auth-layout";
 export * from "./change-password-form";
 export * from "./current-user-display";
 export * from "./delete-account";
+export * from "./email-verification-alert";
 export * from "./forgot-password";
 export * from "./reset-password-form";
 export * from "./sign-in-form";

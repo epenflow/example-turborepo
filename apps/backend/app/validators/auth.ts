@@ -34,3 +34,8 @@ export const changePassword = vine.compile(
     ...newPassword.getProperties(),
   })
 )
+export const emailVerification = vine.compile(
+  vine.object({
+    email: vine.string().email(),
+  })
+)

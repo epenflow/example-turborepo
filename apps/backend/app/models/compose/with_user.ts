@@ -1,3 +1,4 @@
+import InvalidEmailVerificationTokenException from '#exceptions/invalid_email_verification_token_exception'
 import InvalidResetPasswordTokenException from '#exceptions/invalid_reset_password_token_exception'
 import DbTokensProvider from '#models/db_token_provider'
 import { AccessToken, DbAccessTokensProvider } from '@adonisjs/auth/access_tokens'
@@ -62,6 +63,8 @@ type WithUserCredentialsColumn = {
   email: string
   password: string
   lastPasswordChangedAt: DateTime<boolean> | null
+  emailVerifiedAt: DateTime<boolean> | null
+  isEmailVerified: boolean
 }
 
 type WithUserCredentialsClass<
@@ -81,6 +84,10 @@ type WithUserCredentialsClass<
     user: InstanceType<Model>
   ): Promise<{ token: string; expiresAt: Date }>
   updateLastPasswordChangedAt(user: InstanceType<Model>): void
+  createEmailVerificationToken(
+    user: InstanceType<Model>
+  ): Promise<{ token: string; expiresAt: Date }>
+  verifyEmail<T extends WithUserCredentialsClass>(this: T, token: string): Promise<InstanceType<T>>
 }
 
 export function WithUserCredentials<Model extends NormalizeConstructor<typeof BaseModel>>(
@@ -98,6 +105,15 @@ export function WithUserCredentials<Model extends NormalizeConstructor<typeof Ba
 
     @column.dateTime()
     declare lastPasswordChangedAt: DateTime | null
+
+    @column.dateTime()
+    declare emailVerifiedAt: DateTime | null
+
+    @computed()
+    get isEmailVerified(): boolean {
+      if (this.emailVerifiedAt) return true
+      return false
+    }
 
     static accessTokens = DbAccessTokensProvider.forModel(BaseClass)
 
@@ -146,7 +162,28 @@ export function WithUserCredentials<Model extends NormalizeConstructor<typeof Ba
         throw new InvalidResetPasswordTokenException()
       }
 
-      ;(user as any).merge({ password })
+      user.password = password
+      await user.save()
+
+      await BaseClass.tokens.invalidated(token)
+
+      return user
+    }
+
+    static async verifyEmail<This extends WithUserCredentialsClass>(this: This, token: string) {
+      const verifiedToken = await BaseClass.tokens.verify(token, 'email_verification')
+
+      if (!verifiedToken || verifiedToken.isExpires) {
+        throw new InvalidEmailVerificationTokenException()
+      }
+      const { row } = verifiedToken
+      const user = await this.query().where({ id: row.tokenableId }).first()
+
+      if (!user) {
+        throw new InvalidEmailVerificationTokenException()
+      }
+      user.emailVerifiedAt = DateTime.now()
+
       await user.save()
 
       await BaseClass.tokens.invalidated(token)

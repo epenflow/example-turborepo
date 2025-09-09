@@ -14,13 +14,15 @@ import { Route as PageRouteImport } from './routes/page'
 import { Route as dashboardMeRouteImport } from './routes/(dashboard)/me'
 import { Route as authSignUpRouteImport } from './routes/(auth)/sign-up'
 import { Route as authSignInRouteImport } from './routes/(auth)/sign-in'
-import { Route as authResetPasswordRouteImport } from './routes/(auth)/reset-password'
 import { Route as authForgotPasswordRouteImport } from './routes/(auth)/forgot-password'
 import { Route as dashboardsettingsLayoutRouteImport } from './routes/(dashboard)/(settings)/layout'
+import { Route as authqueryLayoutRouteImport } from './routes/(auth)/(query)/layout'
 import { Route as dashboardUsersPageRouteImport } from './routes/(dashboard)/users/page'
 import { Route as dashboardUsersIdRouteImport } from './routes/(dashboard)/users/$id'
 import { Route as dashboardsettingsPasswordRouteImport } from './routes/(dashboard)/(settings)/password'
 import { Route as dashboardsettingsAccountRouteImport } from './routes/(dashboard)/(settings)/account'
+import { Route as authqueryResetPasswordRouteImport } from './routes/(auth)/(query)/reset-password'
+import { Route as authqueryEmailVerificationRouteImport } from './routes/(auth)/(query)/email-verification'
 
 const dashboardLayoutRoute = dashboardLayoutRouteImport.update({
   id: '/(dashboard)',
@@ -46,11 +48,6 @@ const authSignInRoute = authSignInRouteImport.update({
   path: '/sign-in',
   getParentRoute: () => rootRouteImport,
 } as any)
-const authResetPasswordRoute = authResetPasswordRouteImport.update({
-  id: '/(auth)/reset-password',
-  path: '/reset-password',
-  getParentRoute: () => rootRouteImport,
-} as any)
 const authForgotPasswordRoute = authForgotPasswordRouteImport.update({
   id: '/(auth)/forgot-password',
   path: '/forgot-password',
@@ -59,6 +56,11 @@ const authForgotPasswordRoute = authForgotPasswordRouteImport.update({
 const dashboardsettingsLayoutRoute = dashboardsettingsLayoutRouteImport.update({
   id: '/(settings)',
   getParentRoute: () => dashboardLayoutRoute,
+} as any)
+const authqueryLayoutRoute = authqueryLayoutRouteImport.update({
+  id: '/(auth)/(query)',
+  path: '/',
+  getParentRoute: () => rootRouteImport,
 } as any)
 const dashboardUsersPageRoute = dashboardUsersPageRouteImport.update({
   id: '/users/',
@@ -82,14 +84,26 @@ const dashboardsettingsAccountRoute =
     path: '/account',
     getParentRoute: () => dashboardsettingsLayoutRoute,
   } as any)
+const authqueryResetPasswordRoute = authqueryResetPasswordRouteImport.update({
+  id: '/reset-password',
+  path: '/reset-password',
+  getParentRoute: () => authqueryLayoutRoute,
+} as any)
+const authqueryEmailVerificationRoute =
+  authqueryEmailVerificationRouteImport.update({
+    id: '/email-verification',
+    path: '/email-verification',
+    getParentRoute: () => authqueryLayoutRoute,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof dashboardsettingsLayoutRouteWithChildren
   '/forgot-password': typeof authForgotPasswordRoute
-  '/reset-password': typeof authResetPasswordRoute
   '/sign-in': typeof authSignInRoute
   '/sign-up': typeof authSignUpRoute
   '/me': typeof dashboardMeRoute
+  '/email-verification': typeof authqueryEmailVerificationRoute
+  '/reset-password': typeof authqueryResetPasswordRoute
   '/account': typeof dashboardsettingsAccountRoute
   '/password': typeof dashboardsettingsPasswordRoute
   '/users/$id': typeof dashboardUsersIdRoute
@@ -98,10 +112,11 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/': typeof dashboardsettingsLayoutRouteWithChildren
   '/forgot-password': typeof authForgotPasswordRoute
-  '/reset-password': typeof authResetPasswordRoute
   '/sign-in': typeof authSignInRoute
   '/sign-up': typeof authSignUpRoute
   '/me': typeof dashboardMeRoute
+  '/email-verification': typeof authqueryEmailVerificationRoute
+  '/reset-password': typeof authqueryResetPasswordRoute
   '/account': typeof dashboardsettingsAccountRoute
   '/password': typeof dashboardsettingsPasswordRoute
   '/users/$id': typeof dashboardUsersIdRoute
@@ -111,12 +126,14 @@ export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof PageRoute
   '/(dashboard)': typeof dashboardLayoutRouteWithChildren
+  '/(auth)/(query)': typeof authqueryLayoutRouteWithChildren
   '/(dashboard)/(settings)': typeof dashboardsettingsLayoutRouteWithChildren
   '/(auth)/forgot-password': typeof authForgotPasswordRoute
-  '/(auth)/reset-password': typeof authResetPasswordRoute
   '/(auth)/sign-in': typeof authSignInRoute
   '/(auth)/sign-up': typeof authSignUpRoute
   '/(dashboard)/me': typeof dashboardMeRoute
+  '/(auth)/(query)/email-verification': typeof authqueryEmailVerificationRoute
+  '/(auth)/(query)/reset-password': typeof authqueryResetPasswordRoute
   '/(dashboard)/(settings)/account': typeof dashboardsettingsAccountRoute
   '/(dashboard)/(settings)/password': typeof dashboardsettingsPasswordRoute
   '/(dashboard)/users/$id': typeof dashboardUsersIdRoute
@@ -127,10 +144,11 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/forgot-password'
-    | '/reset-password'
     | '/sign-in'
     | '/sign-up'
     | '/me'
+    | '/email-verification'
+    | '/reset-password'
     | '/account'
     | '/password'
     | '/users/$id'
@@ -139,10 +157,11 @@ export interface FileRouteTypes {
   to:
     | '/'
     | '/forgot-password'
-    | '/reset-password'
     | '/sign-in'
     | '/sign-up'
     | '/me'
+    | '/email-verification'
+    | '/reset-password'
     | '/account'
     | '/password'
     | '/users/$id'
@@ -151,12 +170,14 @@ export interface FileRouteTypes {
     | '__root__'
     | '/'
     | '/(dashboard)'
+    | '/(auth)/(query)'
     | '/(dashboard)/(settings)'
     | '/(auth)/forgot-password'
-    | '/(auth)/reset-password'
     | '/(auth)/sign-in'
     | '/(auth)/sign-up'
     | '/(dashboard)/me'
+    | '/(auth)/(query)/email-verification'
+    | '/(auth)/(query)/reset-password'
     | '/(dashboard)/(settings)/account'
     | '/(dashboard)/(settings)/password'
     | '/(dashboard)/users/$id'
@@ -166,8 +187,8 @@ export interface FileRouteTypes {
 export interface RootRouteChildren {
   PageRoute: typeof PageRoute
   dashboardLayoutRoute: typeof dashboardLayoutRouteWithChildren
+  authqueryLayoutRoute: typeof authqueryLayoutRouteWithChildren
   authForgotPasswordRoute: typeof authForgotPasswordRoute
-  authResetPasswordRoute: typeof authResetPasswordRoute
   authSignInRoute: typeof authSignInRoute
   authSignUpRoute: typeof authSignUpRoute
 }
@@ -209,13 +230,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof authSignInRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/(auth)/reset-password': {
-      id: '/(auth)/reset-password'
-      path: '/reset-password'
-      fullPath: '/reset-password'
-      preLoaderRoute: typeof authResetPasswordRouteImport
-      parentRoute: typeof rootRouteImport
-    }
     '/(auth)/forgot-password': {
       id: '/(auth)/forgot-password'
       path: '/forgot-password'
@@ -229,6 +243,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/'
       preLoaderRoute: typeof dashboardsettingsLayoutRouteImport
       parentRoute: typeof dashboardLayoutRoute
+    }
+    '/(auth)/(query)': {
+      id: '/(auth)/(query)'
+      path: '/'
+      fullPath: '/'
+      preLoaderRoute: typeof authqueryLayoutRouteImport
+      parentRoute: typeof rootRouteImport
     }
     '/(dashboard)/users/': {
       id: '/(dashboard)/users/'
@@ -257,6 +278,20 @@ declare module '@tanstack/react-router' {
       fullPath: '/account'
       preLoaderRoute: typeof dashboardsettingsAccountRouteImport
       parentRoute: typeof dashboardsettingsLayoutRoute
+    }
+    '/(auth)/(query)/reset-password': {
+      id: '/(auth)/(query)/reset-password'
+      path: '/reset-password'
+      fullPath: '/reset-password'
+      preLoaderRoute: typeof authqueryResetPasswordRouteImport
+      parentRoute: typeof authqueryLayoutRoute
+    }
+    '/(auth)/(query)/email-verification': {
+      id: '/(auth)/(query)/email-verification'
+      path: '/email-verification'
+      fullPath: '/email-verification'
+      preLoaderRoute: typeof authqueryEmailVerificationRouteImport
+      parentRoute: typeof authqueryLayoutRoute
     }
   }
 }
@@ -295,11 +330,25 @@ const dashboardLayoutRouteWithChildren = dashboardLayoutRoute._addFileChildren(
   dashboardLayoutRouteChildren,
 )
 
+interface authqueryLayoutRouteChildren {
+  authqueryEmailVerificationRoute: typeof authqueryEmailVerificationRoute
+  authqueryResetPasswordRoute: typeof authqueryResetPasswordRoute
+}
+
+const authqueryLayoutRouteChildren: authqueryLayoutRouteChildren = {
+  authqueryEmailVerificationRoute: authqueryEmailVerificationRoute,
+  authqueryResetPasswordRoute: authqueryResetPasswordRoute,
+}
+
+const authqueryLayoutRouteWithChildren = authqueryLayoutRoute._addFileChildren(
+  authqueryLayoutRouteChildren,
+)
+
 const rootRouteChildren: RootRouteChildren = {
   PageRoute: PageRoute,
   dashboardLayoutRoute: dashboardLayoutRouteWithChildren,
+  authqueryLayoutRoute: authqueryLayoutRouteWithChildren,
   authForgotPasswordRoute: authForgotPasswordRoute,
-  authResetPasswordRoute: authResetPasswordRoute,
   authSignInRoute: authSignInRoute,
   authSignUpRoute: authSignUpRoute,
 }

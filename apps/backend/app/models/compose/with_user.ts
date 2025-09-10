@@ -1,5 +1,4 @@
-import InvalidEmailVerificationTokenException from '#exceptions/invalid_email_verification_token_exception'
-import InvalidResetPasswordTokenException from '#exceptions/invalid_reset_password_token_exception'
+import InvalidTokenException from '#exceptions/invalid_token_exception'
 import DbTokensProvider from '#models/db_token_provider'
 import { AccessToken, DbAccessTokensProvider } from '@adonisjs/auth/access_tokens'
 import { withAuthFinder } from '@adonisjs/auth/mixins/lucid'
@@ -90,6 +89,11 @@ type WithUserCredentialsClass<
     user: InstanceType<Model>
   ): Promise<{ token: string; expiresAt: DateTime<boolean> }>
   verifyEmail<T extends WithUserCredentialsClass>(this: T, token: string): Promise<InstanceType<T>>
+  verifyToken<T extends WithUserCredentialsClass>(
+    this: T,
+    token: string,
+    type: 'reset_password' | 'email_verification'
+  ): Promise<InstanceType<T>>
 }
 
 export function WithUserCredentials<Model extends NormalizeConstructor<typeof BaseModel>>(
@@ -152,44 +156,40 @@ export function WithUserCredentials<Model extends NormalizeConstructor<typeof Ba
       token: string,
       password: string
     ) {
-      const verifiedToken = await BaseClass.tokens.verify(token, 'reset_password')
-
-      if (!verifiedToken || verifiedToken.isExpires) {
-        throw new InvalidResetPasswordTokenException()
-      }
-      const { row } = verifiedToken
-
-      const user = await this.query().where({ id: row.tokenableId }).first()
-
-      if (!user) {
-        throw new InvalidResetPasswordTokenException()
-      }
+      const user = await this.verifyToken(token, 'reset_password')
 
       user.password = password
       await user.save()
 
-      await BaseClass.tokens.invalidated(token)
+      await this.tokens.invalidated(token)
 
       return user
     }
 
     static async verifyEmail<This extends WithUserCredentialsClass>(this: This, token: string) {
-      const verifiedToken = await BaseClass.tokens.verify(token, 'email_verification')
+      const user = await this.verifyToken(token, 'email_verification')
 
-      if (!verifiedToken || verifiedToken.isExpires) {
-        throw new InvalidEmailVerificationTokenException()
-      }
-      const { row } = verifiedToken
-      const user = await this.query().where({ id: row.tokenableId }).first()
-
-      if (!user) {
-        throw new InvalidEmailVerificationTokenException()
-      }
       user.emailVerifiedAt = DateTime.now()
 
       await user.save()
 
-      await BaseClass.tokens.invalidated(token)
+      await this.tokens.invalidated(token)
+
+      return user
+    }
+
+    static async verifyToken<This extends WithUserCredentialsClass>(
+      this: This,
+      token: string,
+      type: 'reset_password' | 'email_verification'
+    ) {
+      const verifiedToken = await this.tokens.verify(token, type)
+
+      if (!verifiedToken || verifiedToken.isExpires) {
+        throw new InvalidTokenException()
+      }
+
+      const user = this.query().where({ id: verifiedToken.row.tokenableId }).firstOrFail()
 
       return user
     }

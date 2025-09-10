@@ -1,10 +1,10 @@
 import { Exception } from '@adonisjs/core/exceptions'
 import { HttpContext } from '@adonisjs/core/http'
 
-export default class InvalidResetPasswordTokenException extends Exception {
+export default class InvalidTokenException extends Exception {
   static status = 403
-  static code?: string | undefined = 'E_INVALID_RESET_PASSWORD_TOKEN'
-  static message?: string | undefined = 'The reset password token provided is invalid or expired'
+  static code?: string | undefined = 'E_INVALID_TOKEN'
+  static message?: string | undefined = 'The token provided is invalid or expired'
 
   async handle(error: this, ctx: HttpContext) {
     switch (ctx.request.accepts(['html', 'application/vnd.api+json', 'json'])) {

@@ -79,14 +79,16 @@ type WithUserCredentialsClass<
     token: string,
     password: string
   ): Promise<InstanceType<T>>
-  createResetPasswordToken(user: InstanceType<Model>): Promise<{ token: string; expiresAt: Date }>
+  createResetPasswordToken(
+    user: InstanceType<Model>
+  ): Promise<{ token: string; expiresAt: DateTime<boolean> }>
   createEmailVerificationToken(
     user: InstanceType<Model>
-  ): Promise<{ token: string; expiresAt: Date }>
+  ): Promise<{ token: string; expiresAt: DateTime<boolean> }>
   updateLastPasswordChangedAt(user: InstanceType<Model>): void
   createEmailVerificationToken(
     user: InstanceType<Model>
-  ): Promise<{ token: string; expiresAt: Date }>
+  ): Promise<{ token: string; expiresAt: DateTime<boolean> }>
   verifyEmail<T extends WithUserCredentialsClass>(this: T, token: string): Promise<InstanceType<T>>
 }
 
@@ -124,6 +126,7 @@ export function WithUserCredentials<Model extends NormalizeConstructor<typeof Ba
       'reset_password' | 'email_verification'
     >(BaseClass, {
       table: 'user_tokens',
+      expiresIn: DateTime.now().plus({ hour: 2 }),
     })
 
     @beforeUpdate()

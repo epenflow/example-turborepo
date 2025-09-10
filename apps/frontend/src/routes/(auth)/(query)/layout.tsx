@@ -13,16 +13,16 @@ export const Route = createFileRoute("/(auth)/(query)")({
   loaderDeps: (deps) => deps,
   loader({ deps: { search } }) {
     console.log({ search });
+
+    const expiresIn = DateTime.fromISO(search.expiresAt, { zone: "utc" });
+    const now = DateTime.now().setZone("utc");
+
     if (
       !search.expiresAt ||
       !search.token ||
-      !DateTime.fromISO(search.expiresAt).isValid ||
-      DateTime.fromISO(search.expiresAt, { zone: "utc" }) <
-        DateTime.now().toUTC()
+      !expiresIn.isValid ||
+      expiresIn < now
     ) {
-      // throw new Error(
-      //   "The password reset token provided is invalid or expired.",
-      // );
       throw notFound({
         throw: true,
       });

@@ -5,7 +5,6 @@ import { errors as authErrors } from '@adonisjs/auth'
 import { HttpContext } from '@adonisjs/core/http'
 import emitter from '@adonisjs/core/services/emitter'
 import router from '@adonisjs/core/services/router'
-import { DateTime } from 'luxon'
 
 export default class PasswordController {
   async forgot({ request }: HttpContext) {
@@ -14,19 +13,20 @@ export default class PasswordController {
 
     if (user) {
       const { token, expiresAt } = await User.createResetPasswordToken(user)
-      const expiresIn = DateTime.fromJSDate(expiresAt)
 
       const link = router
         .builder()
         .disableRouteLookup()
         .prefixUrl(env.get('APP_BASE_URL'))
-        .qs({ token, expiresAt: expiresIn.toISO() })
+        .qs({ token, expiresAt: expiresAt.toISO() })
         .make('reset-password')
 
-      emitter.emit('user:reset-password-request', {
+      console.log({ expiresAt })
+      emitter.emit('user:password', {
         user,
         link,
-        expiresAt: `${expiresIn.toISO()}`,
+        type: 'request',
+        expiresAt: `${expiresAt.toRelative()}`,
       })
     }
 
@@ -42,7 +42,7 @@ export default class PasswordController {
       const data = await request.validateUsing(AuthValidator.resetPassword)
       const user = await User.resetPassword(token, data.new)
 
-      emitter.emit('user:reset-password-confirm', user)
+      emitter.emit('user:password', { type: 'confirm', user })
     }
     return {
       message: 'Your password has been reset successfully.',

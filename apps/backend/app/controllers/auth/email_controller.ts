@@ -4,7 +4,6 @@ import { AuthValidator } from '#validators/index'
 import { HttpContext } from '@adonisjs/core/http'
 import emitter from '@adonisjs/core/services/emitter'
 import router from '@adonisjs/core/services/router'
-import { DateTime } from 'luxon'
 
 export default class EmailController {
   async send({ request }: HttpContext) {
@@ -13,19 +12,19 @@ export default class EmailController {
 
     if (user) {
       const { token, expiresAt } = await User.createEmailVerificationToken(user)
-      const expiresIn = DateTime.fromJSDate(expiresAt, { zone: 'utc' })
 
       const link = router
         .builder()
         .disableRouteLookup()
         .prefixUrl(env.get('APP_BASE_URL'))
-        .qs({ token, expiresAt: expiresIn.toISO() })
+        .qs({ token, expiresAt: expiresAt.toISO() })
         .make('email-verification')
 
-      emitter.emit('user:email-verification-request', {
+      emitter.emit('user:email', {
         user,
         link,
-        expiresAt: `${expiresIn.toISO()}`,
+        type: 'request',
+        expiresAt: `${expiresAt.toRelative()}`,
       })
     }
 
@@ -45,7 +44,11 @@ export default class EmailController {
         .prefixUrl(env.get('APP_BASE_URL'))
         .make('sign-in')
 
-      emitter.emit('user:email-verification-confirm', { user, link })
+      emitter.emit('user:email', {
+        type: 'confirm',
+        user,
+        link,
+      })
     }
 
     return {

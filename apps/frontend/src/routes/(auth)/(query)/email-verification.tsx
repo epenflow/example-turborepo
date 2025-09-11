@@ -3,7 +3,6 @@ import { Loader2 } from "lucide-react";
 
 import {
   Button,
-  Card,
   CardDescription,
   CardFooter,
   CardHeader,
@@ -92,11 +91,5 @@ function RouteComponent() {
     );
   };
 
-  return (
-    <div className="flex items-center min-h-screen px-8">
-      <Card className="max-w-sm w-full mx-auto">
-        <CardContent />
-      </Card>
-    </div>
-  );
+  return <CardContent />;
 }

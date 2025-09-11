@@ -3,6 +3,8 @@ import { fallback, zodValidator } from "@tanstack/zod-adapter";
 import { DateTime } from "luxon";
 import z from "zod";
 
+import { AuthLayout } from "~/features/auth";
+
 const querySchema = z.object({
   token: fallback(z.string(), "").default(""),
   expiresAt: fallback(z.string(), "").default(""),
@@ -28,5 +30,9 @@ export const Route = createFileRoute("/(auth)/(query)")({
       });
     }
   },
-  component: Outlet,
+  component: () => (
+    <AuthLayout>
+      <Outlet />
+    </AuthLayout>
+  ),
 });

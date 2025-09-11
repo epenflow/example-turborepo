@@ -6,7 +6,7 @@ import {
   CardHeader,
   CardTitle,
 } from "~/components/ui";
-import { AuthLayout, ResetPasswordForm } from "~/features/auth";
+import { ResetPasswordForm } from "~/features/auth";
 
 export const Route = createFileRoute("/(auth)/(query)/reset-password")({
   component: RouteComponent,
@@ -16,7 +16,7 @@ function RouteComponent() {
   const query = Route.useSearch();
 
   return (
-    <AuthLayout>
+    <>
       <CardHeader>
         <CardTitle className="text-2xl">Reset Password</CardTitle>
         <CardDescription>
@@ -26,6 +26,6 @@ function RouteComponent() {
       <CardContent>
         <ResetPasswordForm token={query.token} />
       </CardContent>
-    </AuthLayout>
+    </>
   );
 }

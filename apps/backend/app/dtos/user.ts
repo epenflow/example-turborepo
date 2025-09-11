@@ -32,7 +32,7 @@ export default class UserDto extends BaseModelDto {
     // this.password = user.password
     this.dob = user.dob?.toISO() || null
     this.age = user.age
-    this.avatar = user.avatar
+    this.avatar = user.avatar?.url || null
     this.fullName = user.fullName
     this.initialName = user.initialName
     this.createdAt = user.createdAt.toISO()!

@@ -2,6 +2,7 @@ import UserDto from '#dtos/user'
 import { UserValidator } from '#validators/index'
 import { errors as authErrors } from '@adonisjs/auth'
 import { HttpContext } from '@adonisjs/core/http'
+import { attachmentManager } from '@jrmc/adonis-attachment'
 
 export default class AccountController {
   async destroy({ auth, request }: HttpContext) {
@@ -21,13 +22,17 @@ export default class AccountController {
 
   async update({ request, auth }: HttpContext) {
     const user = auth.getUserOrFail()
-    const data = await request.validateUsing(UserValidator.updateUser, {
+    const { avatar, ...data } = await request.validateUsing(UserValidator.updateUser, {
       meta: {
         id: user.id,
       },
     })
 
-    await user.withAvatarMergeAndSave(data)
+    if (avatar) {
+      user.avatar = await attachmentManager.createFromFile(avatar)
+    }
+
+    await user.merge(data).save()
 
     return {
       message: 'Profile updated successfully.',

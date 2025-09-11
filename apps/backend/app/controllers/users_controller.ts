@@ -2,6 +2,7 @@ import UserDto from '#dtos/user'
 import { default as User } from '#models/user'
 import { UserValidator } from '#validators/index'
 import type { HttpContext } from '@adonisjs/core/http'
+import { attachmentManager } from '@jrmc/adonis-attachment'
 
 export default class UsersController {
   /**
@@ -12,6 +13,8 @@ export default class UsersController {
 
     const users = await User.query().whereNot('id', user.id)
 
+    console.log({ users: UserDto.fromArray(users) })
+
     return {
       users: UserDto.fromArray(users),
     }
@@ -21,11 +24,11 @@ export default class UsersController {
    * Handle form submission for the create action
    */
   async store({ request }: HttpContext) {
-    const data = await request.validateUsing(UserValidator.createUser)
+    const { avatar, ...data } = await request.validateUsing(UserValidator.createUser)
 
-    const avatar = await User.saveAvatarToDisk(data.avatar)
+    // const avatar = await User.saveAvatarToDisk(data.avatar)
 
-    const user = await User.create({ ...data, avatar })
+    const user = await User.create(data)
 
     return {
       message: 'user created successfully',
@@ -50,13 +53,16 @@ export default class UsersController {
   async update({ params, request }: HttpContext) {
     const user = await User.findByOrFail('id', params.id)
 
-    const data = await request.validateUsing(UserValidator.updateUser, {
+    const { avatar, ...data } = await request.validateUsing(UserValidator.updateUser, {
       meta: {
         id: user.id,
       },
     })
 
-    await user.withAvatarMergeAndSave(data)
+    if (avatar) {
+      user.avatar = await attachmentManager.createFromFile(avatar)
+    }
+    await user.merge(data).save()
 
     return {
       message: `user updated successfully`,

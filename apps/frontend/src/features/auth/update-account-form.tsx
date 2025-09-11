@@ -20,6 +20,7 @@ import * as AuthService from "~/services/auth";
 export function UpdateAccountForm() {
   const { currentUser } = AuthService.useAuthSession();
   const { mutateAsync } = AuthService.useUpdateAccount();
+
   const [previewAvatar, setPreviewAvatar] = useAvatarPreview(
     currentUser?.avatar,
   );

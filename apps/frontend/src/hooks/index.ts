@@ -24,8 +24,6 @@ export function useIsMobile() {
 
 export function useAvatarPreview(fileName?: string | null) {
   return useState<string | undefined>(
-    fileName
-      ? `${t3Env.client.VITE_APP_BASE_URL}/uploads/${fileName}`
-      : undefined,
+    fileName ? t3Env.client.VITE_APP_BASE_URL + fileName : undefined,
   );
 }

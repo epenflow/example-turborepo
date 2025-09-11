@@ -1,5 +1,5 @@
 import { Avatar, AvatarFallback, AvatarImage } from "~/components/ui";
-import t3Env from "~/integrations/t3-env";
+import { useAvatarPreview } from "~/hooks";
 import { useAuthSession } from "~/services/auth";
 
 export function CurrentUserDisplay({
@@ -10,6 +10,7 @@ export function CurrentUserDisplay({
   showUsername?: boolean;
 }) {
   const { currentUser } = useAuthSession();
+  const [previewAvatar] = useAvatarPreview(currentUser?.avatar);
 
   if (!currentUser) return;
 
@@ -17,9 +18,7 @@ export function CurrentUserDisplay({
     <>
       <Avatar className="h-8 w-8 overflow-hidden rounded-full">
         {currentUser.avatar ? (
-          <AvatarImage
-            src={`${t3Env.client.VITE_APP_BASE_URL}/uploads/${currentUser.avatar}`}
-          />
+          <AvatarImage src={previewAvatar} />
         ) : (
           <AvatarFallback>{currentUser.initialName}</AvatarFallback>
         )}

@@ -9,194 +9,229 @@ import type { InferInput } from '@vinejs/vine/types'
 
 type ApiUsersGetHead = {
   request: unknown
-  response: MakeTuyauResponse<import('../app/controllers/users_controller.ts').default['index'], false>
+  response: MakeTuyauResponse<
+    import('../app/controllers/users_controller.ts').default['index'],
+    false
+  >
 }
 type ApiUsersPost = {
   request: unknown
-  response: MakeTuyauResponse<import('../app/controllers/users_controller.ts').default['store'], false>
+  response: MakeTuyauResponse<
+    import('../app/controllers/users_controller.ts').default['store'],
+    false
+  >
 }
 type ApiUsersIdGetHead = {
   request: unknown
-  response: MakeTuyauResponse<import('../app/controllers/users_controller.ts').default['show'], false>
+  response: MakeTuyauResponse<
+    import('../app/controllers/users_controller.ts').default['show'],
+    false
+  >
 }
 type ApiUsersIdPutPatch = {
   request: unknown
-  response: MakeTuyauResponse<import('../app/controllers/users_controller.ts').default['update'], false>
+  response: MakeTuyauResponse<
+    import('../app/controllers/users_controller.ts').default['update'],
+    false
+  >
 }
 type ApiUsersIdDelete = {
   request: unknown
-  response: MakeTuyauResponse<import('../app/controllers/users_controller.ts').default['destroy'], false>
+  response: MakeTuyauResponse<
+    import('../app/controllers/users_controller.ts').default['destroy'],
+    false
+  >
 }
 type AuthSigninPost = {
   request: unknown
-  response: MakeTuyauResponse<import('../app/controllers/auth/session_controller.ts').default['signIn'], false>
+  response: MakeTuyauResponse<
+    import('../app/controllers/auth/session_controller.ts').default['signIn'],
+    false
+  >
 }
 type AuthSignupPost = {
   request: unknown
-  response: MakeTuyauResponse<import('../app/controllers/auth/session_controller.ts').default['signUp'], false>
+  response: MakeTuyauResponse<
+    import('../app/controllers/auth/session_controller.ts').default['signUp'],
+    false
+  >
 }
 type AuthForgotpasswordPost = {
   request: unknown
-  response: MakeTuyauResponse<import('../app/controllers/auth/password_controller.ts').default['forgot'], false>
+  response: MakeTuyauResponse<
+    import('../app/controllers/auth/password_controller.ts').default['forgot'],
+    false
+  >
 }
 type AuthResetpasswordPost = {
   request: unknown
-  response: MakeTuyauResponse<import('../app/controllers/auth/password_controller.ts').default['reset'], false>
+  response: MakeTuyauResponse<
+    import('../app/controllers/auth/password_controller.ts').default['reset'],
+    false
+  >
 }
 type AuthEmailverificationSendPost = {
   request: unknown
-  response: MakeTuyauResponse<import('../app/controllers/auth/email_controller.ts').default['send'], false>
+  response: MakeTuyauResponse<
+    import('../app/controllers/auth/email_controller.ts').default['send'],
+    false
+  >
 }
 type AuthEmailverificationConfirmGetHead = {
   request: unknown
-  response: MakeTuyauResponse<import('../app/controllers/auth/email_controller.ts').default['confirm'], false>
+  response: MakeTuyauResponse<
+    import('../app/controllers/auth/email_controller.ts').default['confirm'],
+    false
+  >
 }
 type AuthMeGetHead = {
   request: unknown
-  response: MakeTuyauResponse<import('../app/controllers/auth/session_controller.ts').default['me'], false>
+  response: MakeTuyauResponse<
+    import('../app/controllers/auth/session_controller.ts').default['me'],
+    false
+  >
 }
 type AuthChangepasswordPost = {
   request: unknown
-  response: MakeTuyauResponse<import('../app/controllers/auth/password_controller.ts').default['change'], false>
+  response: MakeTuyauResponse<
+    import('../app/controllers/auth/password_controller.ts').default['change'],
+    false
+  >
 }
 type AuthDeleteaccountPost = {
   request: unknown
-  response: MakeTuyauResponse<import('../app/controllers/auth/account_controller.ts').default['destroy'], false>
+  response: MakeTuyauResponse<
+    import('../app/controllers/auth/account_controller.ts').default['destroy'],
+    false
+  >
 }
 type AuthUpdateaccountPost = {
   request: unknown
-  response: MakeTuyauResponse<import('../app/controllers/auth/account_controller.ts').default['update'], false>
+  response: MakeTuyauResponse<
+    import('../app/controllers/auth/account_controller.ts').default['update'],
+    false
+  >
 }
 type AuthSignoutDelete = {
   request: unknown
-  response: MakeTuyauResponse<import('../app/controllers/auth/session_controller.ts').default['signOut'], false>
+  response: MakeTuyauResponse<
+    import('../app/controllers/auth/session_controller.ts').default['signOut'],
+    false
+  >
 }
 export interface ApiDefinition {
-  'api': {
-    'users': {
-      '$url': {
-      };
-      '$get': ApiUsersGetHead;
-      '$head': ApiUsersGetHead;
-      '$post': ApiUsersPost;
+  api: {
+    users: {
+      '$url': {}
+      '$get': ApiUsersGetHead
+      '$head': ApiUsersGetHead
+      '$post': ApiUsersPost
       ':id': {
-        '$url': {
-        };
-        '$get': ApiUsersIdGetHead;
-        '$head': ApiUsersIdGetHead;
-        '$put': ApiUsersIdPutPatch;
-        '$patch': ApiUsersIdPutPatch;
-        '$delete': ApiUsersIdDelete;
-      };
-    };
-  };
-  'auth': {
+        $url: {}
+        $get: ApiUsersIdGetHead
+        $head: ApiUsersIdGetHead
+        $put: ApiUsersIdPutPatch
+        $patch: ApiUsersIdPutPatch
+        $delete: ApiUsersIdDelete
+      }
+    }
+  }
+  auth: {
     'sign-in': {
-      '$url': {
-      };
-      '$post': AuthSigninPost;
-    };
+      $url: {}
+      $post: AuthSigninPost
+    }
     'sign-up': {
-      '$url': {
-      };
-      '$post': AuthSignupPost;
-    };
+      $url: {}
+      $post: AuthSignupPost
+    }
     'forgot-password': {
-      '$url': {
-      };
-      '$post': AuthForgotpasswordPost;
-    };
+      $url: {}
+      $post: AuthForgotpasswordPost
+    }
     'reset-password': {
-      '$url': {
-      };
-      '$post': AuthResetpasswordPost;
-    };
+      $url: {}
+      $post: AuthResetpasswordPost
+    }
     'email-verification': {
-      'send': {
-        '$url': {
-        };
-        '$post': AuthEmailverificationSendPost;
-      };
-      'confirm': {
-        '$url': {
-        };
-        '$get': AuthEmailverificationConfirmGetHead;
-        '$head': AuthEmailverificationConfirmGetHead;
-      };
-    };
+      send: {
+        $url: {}
+        $post: AuthEmailverificationSendPost
+      }
+      confirm: {
+        $url: {}
+        $get: AuthEmailverificationConfirmGetHead
+        $head: AuthEmailverificationConfirmGetHead
+      }
+    }
     'me': {
-      '$url': {
-      };
-      '$get': AuthMeGetHead;
-      '$head': AuthMeGetHead;
-    };
+      $url: {}
+      $get: AuthMeGetHead
+      $head: AuthMeGetHead
+    }
     'change-password': {
-      '$url': {
-      };
-      '$post': AuthChangepasswordPost;
-    };
+      $url: {}
+      $post: AuthChangepasswordPost
+    }
     'delete-account': {
-      '$url': {
-      };
-      '$post': AuthDeleteaccountPost;
-    };
+      $url: {}
+      $post: AuthDeleteaccountPost
+    }
     'update-account': {
-      '$url': {
-      };
-      '$post': AuthUpdateaccountPost;
-    };
+      $url: {}
+      $post: AuthUpdateaccountPost
+    }
     'sign-out': {
-      '$url': {
-      };
-      '$delete': AuthSignoutDelete;
-    };
-  };
+      $url: {}
+      $delete: AuthSignoutDelete
+    }
+  }
 }
 const routes = [
   {
     params: [],
     name: 'users.index',
     path: '/api/users',
-    method: ["GET","HEAD"],
+    method: ['GET', 'HEAD'],
     types: {} as ApiUsersGetHead,
   },
   {
     params: [],
     name: 'users.store',
     path: '/api/users',
-    method: ["POST"],
+    method: ['POST'],
     types: {} as ApiUsersPost,
   },
   {
-    params: ["id"],
+    params: ['id'],
     name: 'users.show',
     path: '/api/users/:id',
-    method: ["GET","HEAD"],
+    method: ['GET', 'HEAD'],
     types: {} as ApiUsersIdGetHead,
   },
   {
-    params: ["id"],
+    params: ['id'],
     name: 'users.update',
     path: '/api/users/:id',
-    method: ["PUT","PATCH"],
+    method: ['PUT', 'PATCH'],
     types: {} as ApiUsersIdPutPatch,
   },
   {
-    params: ["id"],
+    params: ['id'],
     name: 'users.destroy',
     path: '/api/users/:id',
-    method: ["DELETE"],
+    method: ['DELETE'],
     types: {} as ApiUsersIdDelete,
   },
   {
     params: [],
     name: 'reset-password',
     path: '/auth/reset-password',
-    method: ["POST"],
+    method: ['POST'],
     types: {} as AuthResetpasswordPost,
   },
-] as const;
+] as const
 export const api = {
   routes,
-  definition: {} as ApiDefinition
+  definition: {} as ApiDefinition,
 }
